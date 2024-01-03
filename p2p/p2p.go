@@ -15,7 +15,8 @@ import (
 
 // Config struct to hold server configuration
 type Config struct {
-	PrivateKey  string   `json:"private_key"`  // Ethereum-compatible private key
+	PrivateKey string `json:"private_key"` // Ethereum-compatible private key
+	// "IP>PUBLIC_KEY"
 	Peers       []string `json:"peers"`        // List of peers
 	LatestBlock string   `json:"latest_block"` // Identifier for the latest block
 }

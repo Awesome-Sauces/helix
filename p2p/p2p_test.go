@@ -1,7 +1,10 @@
 package p2p
 
 import (
+	"log"
 	"testing"
+
+	"github.com/Awesome-Sauces/helix/crypto/ethereum"
 )
 
 func TestClient(t *testing.T) {
@@ -12,5 +15,13 @@ func TestClient(t *testing.T) {
 	Call("localhost:8080")
 	Call("localhost:8079")
 	Call("localhost:8077")
+
+	pk, err := ethereum.NewPrivateKey()
+
+	if err != nil {
+		return
+	}
+
+	log.Println(ethereum.PublicKeyToAddress(pk.PublicKey()))
 
 }
