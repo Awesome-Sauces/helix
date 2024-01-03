@@ -53,22 +53,8 @@ func PublicKeyToAddress(pubKey *ecdsa.PublicKey) string {
 // GenerateMnemonic generates a new mnemonic phrase.
 // The wordCount should be one of the following: 12, 15, 18, 21, 24.
 func GenerateMnemonic(wordCount int) (string, error) {
-	var bitSize int
-	switch wordCount {
-	case 12:
-		bitSize = 128
-	case 15:
-		bitSize = 160
-	case 18:
-		bitSize = 192
-	case 21:
-		bitSize = 224
-	case 24:
-		bitSize = 256
-	default:
-		return "", errors.New("invalid word count: must be 12, 15, 18, 21, or 24")
-	}
 
+	bitSize := int(float64(wordCount) * 10.6666666667)
 	entropy, err := bip39.NewEntropy(bitSize)
 	if err != nil {
 		return "", err

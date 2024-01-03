@@ -50,6 +50,9 @@ func TestMnemonicToPrivateKey(t *testing.T) {
 	privKey, err := MnemonicToPrivateKey(mnemonic)
 	assert.Nil(t, err)
 	assert.NotNil(t, privKey)
+
+	log.Println(privKey.ToString())
+	log.Println(PublicKeyToAddress(privKey.PublicKey()))
 }
 
 // You can add more tests as required...
