@@ -1,36 +1,59 @@
 package p2p
 
 import (
+	"bytes"
 	"fmt"
 	"net"
-	"os"
+
+	"github.com/Awesome-Sauces/helix/crypto/xdr"
 )
 
-func Start(host string) {
-	listener, err := net.Listen("tcp", host)
+func StartTCPServer() {
+	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
-		os.Exit(1)
+		return
 	}
 	defer listener.Close()
-	fmt.Println("Listening on ", host)
+	fmt.Println("Server is listening on :8080")
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("Error accepting:", err.Error())
-			os.Exit(1)
+			continue
 		}
-		go handleRequest(conn)
+		go handleTraffic(conn)
 	}
 }
 
-func handleRequest(conn net.Conn) {
-	buffer := make([]byte, 1024)
-	length, err := conn.Read(buffer)
+func handleTraffic(conn net.Conn) {
+	defer conn.Close()
+
+	buffer := make([]byte, 4) // Buffer to read 4 bytes
+	_, err := conn.Read(buffer)
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
+		return
 	}
-	fmt.Println("Received:", string(buffer[:length]))
-	conn.Close()
+
+	h := "Send"
+
+	var w bytes.Buffer
+	bytesWritten, err := xdr.Marshal(&w, &h)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	encodedData := w.Bytes()
+	fmt.Println("bytes written:", bytesWritten)
+	fmt.Println("encoded data:", encodedData)
+
+	// Process the data (optional, based on your logic)
+	fmt.Println("Received data:", buffer)
+
+	// Sending back 2 bytes
+	response := []byte{0x01, 0x02}
+	conn.Write(response)
 }
