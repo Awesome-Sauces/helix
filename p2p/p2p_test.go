@@ -7,6 +7,37 @@ import (
 	"testing"
 )
 
+func joinByteArrays(v1 []byte, v2 []byte) []byte {
+	return append(v1, v2...)
+}
+
+func TestByteHeaders(t *testing.T) {
+	bytes := []byte{}
+
+	header := []byte("getClassMaxByteArrayLengthCapAll")
+
+	bytes = append(bytes, []byte{0x00, 0x00, 0x00, 0x00}...)
+	//bytes = append(bytes, 0xAF)
+
+	bytes = joinByteArrays(bytes, header)
+
+	for key, val := range bytes {
+		fmt.Println(key, ":", val)
+	}
+
+	var sstring []byte
+
+	for key, val := range bytes {
+		if key < 2 {
+			continue
+		}
+
+		sstring = append(sstring, val)
+	}
+
+	fmt.Println(string(sstring))
+}
+
 func TestClient(t *testing.T) {
 
 	go StartTCPServer()
