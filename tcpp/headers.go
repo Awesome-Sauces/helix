@@ -1,6 +1,7 @@
 package tcpp
 
 import (
+	"fmt"
 	"log"
 	"net"
 )
@@ -62,7 +63,7 @@ func DigestRequest(conn net.Conn) (string, []byte) {
 func SearchValues() {
 
 	// An example of transmitting variables over tcpp (TCP plus)
-	_ = []byte{
+	values := []byte{
 		0x00,
 		0x74,
 		0x6F,
@@ -97,6 +98,21 @@ func SearchValues() {
 		0x00, // After we end this string we will add an extra byte
 		0x04, // This is ASCII *EOT* which means the variables end
 		// It also means End of Transmission.
+	}
+
+	position := 0
+
+	forward := func() {
+		if position+1 <= len(values) {
+			position++
+		}
+	}
+
+	fmt.Println(forward)
+	fmt.Println(position)
+
+	for i := 0; i < len(values); i++ {
+		
 	}
 
 }
