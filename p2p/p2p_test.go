@@ -42,6 +42,23 @@ func CompileToTCPP(args ...[]byte) ([]byte, error) {
 	return request, nil
 }
 
+const (
+	NULL        = 0
+	String      = 1
+	Signed32    = 2
+	Unsigned32  = 3
+	Signed64    = 4
+	Unsigned64  = 5
+	Signed128   = 6
+	Unsigned128 = 7
+)
+
+type T_var struct {
+	Name  string
+	Type  int
+	Value any
+}
+
 func TestVariableSearch(t *testing.T) {
 	// An example of transmitting variables over tcpp (TCP plus)
 	b := make([]byte, 8)
