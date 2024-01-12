@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/Awesome-Sauces/helix/crypto/ethereum"
-	"github.com/Awesome-Sauces/helix/p2p"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +32,7 @@ var badger = &cobra.Command{
 	Use:   "hbbft",
 	Short: "Test the Honey Badger Consensus",
 	Run: func(cmd *cobra.Command, args []string) {
-		p2p.RunBadgerBenchmark()
+		fmt.Println("Hello World")
 	},
 }
 
