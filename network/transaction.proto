@@ -1,0 +1,41 @@
+package network;
+
+syntax = "proto3";
+
+message TResult {
+    int32 exit_code = 1;
+    string result = 2;
+}
+
+message CResult {
+    int32 exit_code = 1;
+    string result = 2;
+}
+
+message Transaction {
+    string sender = 1;
+    string receiver = 2;
+
+    string tx_sequence = 3;
+    string type = 4;
+    string payload = 5; // XDR Encoded -> String
+    string hash = 6; // tx_sequence+type+payload(xdr)
+    string signature = 7; // signature of hash
+}
+
+message ContractInteract {
+    string contract_id = 1;// The hash of the contract bytecode
+    string submitter = 2; // address
+    bytes  arguments = 3; // A small piece of bytecode that will be ran prior to running the contract bytecode. The result of this will be accessible by the contract.
+    string signature = 4; // Signature of the contract_id + arguments
+}
+
+service TransactionHandler {
+    rpc SubmitTransaction(Transaction) returns (TResult);
+    rpc VerifyTransaction(string) returns (TResult); // Requires transaction 
+}
+
+service ContractHandler {
+    rpc CallContract(ContractInteract) return (CResult);
+    rpc VerifyContract(string) return (CResult);
+}

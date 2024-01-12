@@ -8,3 +8,7 @@ FAILED
 ## 2024-01-07
 Build out TCP protocol for doing transactions on the network. (Fixed
 byte positions, with fixed header sizes)
+
+FAILED
+
+## 
