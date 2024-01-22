@@ -1,8 +1,7 @@
 package hydrogen
 
 import (
-	"encoding/binary"
-	"fmt"
+	"errors"
 	"log"
 	"net"
 )
@@ -17,6 +16,12 @@ const (
 	Signed128   = 6
 	Unsigned128 = 7
 )
+
+type FunctionArgument struct {
+	Name  string
+	Type  string
+	Bytes []byte
+}
 
 // first byte = request size in bytes
 // second byte = request size in bytes
@@ -72,7 +77,7 @@ func DigestRequest(conn net.Conn) (string, []byte) {
 	return string(b_endpoint), t_buffer
 }
 
-func MapVariables(data []byte) {
+func MapVariables(data []byte) []FunctionArgument {
 	// Example use case
 	//b := make([]byte, 8)
 	//binary.LittleEndian.PutUint64(b, uint64(1234567891234567890))
@@ -80,77 +85,98 @@ func MapVariables(data []byte) {
 
 	i := 0
 
-	forward := func() {
+	forward := func() bool {
 		if i+1 <= len(data) {
 			i++
+			return false
 		}
-	}
 
-	fmt.Println(i)
+		return true
+	}
 
 	if i >= len(data) {
-		return
+		return nil
 	}
 
-	build_var := func() ([]byte, []byte, []byte) {
+	build_var := func() ([]byte, []byte, []byte, error) {
 		var_name := []byte{}
 		var_type := []byte{}
 		var_value := []byte{}
 
-		for data[i] != 0x00 {
+		for i != len(data) && data[i] != 0x00 {
 			var_name = append(var_name, data[i])
-			forward()
+			if forward() {
+				return nil, nil, nil, errors.New("Variable Search ENDED")
+			}
 		}
 
-		forward()
+		if forward() {
+			return nil, nil, nil, errors.New("Variable Search ENDED")
+		}
 
-		for data[i] != 0x00 {
+		for i != len(data) && data[i] != 0x00 {
 			var_type = append(var_type, data[i])
-			forward()
+			if forward() {
+				return nil, nil, nil, errors.New("Variable Search ENDED")
+			}
 		}
 
-		forward()
+		if forward() {
+			return nil, nil, nil, errors.New("Variable Search ENDED")
+		}
 
 		if string(var_type) == "i32" || string(var_type) == "u32" {
 			for iter := 0; iter < 4; iter++ {
 				var_value = append(var_value, data[i])
-				forward()
+				if forward() {
+					return nil, nil, nil, errors.New("Variable Search ENDED")
+				}
 			}
 		}
 
 		if string(var_type) == "i64" || string(var_type) == "u64" {
 			for iter := 0; iter < 8; iter++ {
 				var_value = append(var_value, data[i])
-				forward()
+				if forward() {
+					return nil, nil, nil, errors.New("Variable Search ENDED")
+				}
 			}
 		}
 
 		if string(var_type) == "i128" || string(var_type) == "u128" {
 			for iter := 0; iter < 16; iter++ {
 				var_value = append(var_value, data[i])
-				forward()
+				if forward() {
+					return nil, nil, nil, errors.New("Variable Search ENDED")
+				}
 			}
 		}
 
 		if string(var_type) == "str" {
 			for data[i] != 0x00 {
 				var_value = append(var_value, data[i])
-				forward()
+				if forward() {
+					return nil, nil, nil, errors.New("Variable Search ENDED")
+				}
 			}
 		}
 
-		return var_name, var_type, var_value
+		return var_name, var_type, var_value, nil
 	}
 
-	vn, vt, vv := build_var()
+	retval := []FunctionArgument{}
 
-	fmt.Println(string(vn))
-	fmt.Println(string(vt))
-	fmt.Println(int64(binary.LittleEndian.Uint64(vv)))
+	for {
+		vn, vt, vv, err := build_var()
 
-	varn, vart, varv := build_var()
+		if err != nil {
+			return retval
+		}
 
-	fmt.Println(string(varn))
-	fmt.Println(string(vart))
-	fmt.Println(string(varv))
+		retval = append(retval, FunctionArgument{Name: string(vn), Type: string(vt), Bytes: vv})
+	}
+
+	//fmt.Println(string(vn))
+	//fmt.Println(string(vt))
+	//fmt.Println(int64(binary.LittleEndian.Uint64(vv)))
 }
