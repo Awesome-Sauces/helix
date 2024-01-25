@@ -1,6 +1,7 @@
 package hydrogen
 
 import (
+	"encoding/binary"
 	"log"
 	"net"
 )
@@ -50,7 +51,8 @@ func DigestRequest(conn net.Conn) (string, []byte) {
 		return "nil", nil
 	}
 
-	size := buffer[0] + buffer[1] + buffer[2] + buffer[3]
+	// Convert the first 4 bytes to a uint32 using big-endian format
+	size := binary.BigEndian.Uint32(buffer[:4]) + 4
 
 	buffer = make([]byte, size)
 	_, err = conn.Read(buffer)
@@ -63,14 +65,27 @@ func DigestRequest(conn net.Conn) (string, []byte) {
 
 	t_buffer := []byte{}
 
+	endpoint_stop := 0
+
 	for i, val := range buffer {
-		if i <= 35 && i > 3 {
-			if val != 0 {
-				b_endpoint = append(b_endpoint, val)
-			}
+		if i > 5 && i == 0 {
+			endpoint_stop = i
+			break
+		} else if i > 5 {
+			b_endpoint = append(b_endpoint, val)
+		}
+	}
+
+	for i, val := range buffer {
+		if i < 36 && val == 0 && i > 4 {
+			stop = true
 		}
 
-		t_buffer = append(t_buffer, val)
+		if i > 4 && !stop {
+			b_endpoint = append(b_endpoint, val)
+		} else if stop {
+			t_buffer = append(t_buffer, val)
+		}
 	}
 
 	return string(b_endpoint), t_buffer

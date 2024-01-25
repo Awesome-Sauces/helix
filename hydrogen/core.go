@@ -6,13 +6,13 @@ import (
 )
 
 func StartTCPServer() {
-	listener, err := net.Listen("tcp", ":8080")
+	listener, err := net.Listen("tcp", ":8000")
 	if err != nil {
 		log.Println("Error listening:", err.Error())
 		return
 	}
 	defer listener.Close()
-	log.Println("Server is listening on :8080")
+	log.Println("Server listening on :8000")
 
 	for {
 		conn, err := listener.Accept()

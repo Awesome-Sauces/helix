@@ -7,7 +7,35 @@ import (
 	"net"
 	"os"
 	"testing"
+	"time"
 )
+
+func TestSizeCalculation(t *testing.T) {
+	buffer := []byte{
+		0x00,
+		0x00,
+		0x00,
+		0x15,
+	}
+
+	size := binary.BigEndian.Uint32(buffer[:4])
+	log.Printf("Interpreted as 0x00000015, the size is: %d", size)
+
+	// To demonstrate the original scenario:
+	buffer265 := []byte{
+		0x00,
+		0x00,
+		0x01,
+		0x05,
+	}
+
+	size265 := binary.BigEndian.Uint32(buffer265[:4])
+	log.Printf("Interpreted as 0x00000105, the size is: %d", size265)
+
+	fmt.Println("Length of buffer:", len(buffer))
+	fmt.Println("Length of buffer265:", len(buffer265))
+
+}
 
 func TestMapVariables(t *testing.T) {
 	b := make([]byte, 8)
@@ -25,7 +53,9 @@ func TestMapVariables(t *testing.T) {
 }
 
 func TestServerCore(t *testing.T) {
-	StartTCPServer()
+	go StartTCPServer()
+
+	time.Sleep(1 * time.Second)
 
 	b := make([]byte, 8)
 	binary.LittleEndian.PutUint64(b, uint64(1234567891234567890))
@@ -41,7 +71,7 @@ func TestServerCore(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	conn, err := net.Dial("tcp", "localhost:8080")
+	conn, err := net.Dial("tcp", "localhost:8000")
 	if err != nil {
 		fmt.Println("Error connecting:", err.Error())
 		os.Exit(1)
@@ -49,4 +79,6 @@ func TestServerCore(t *testing.T) {
 
 	conn.Write(request)
 	conn.Close()
+
+	select {}
 }
