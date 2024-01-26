@@ -23,6 +23,22 @@ type FunctionArgument struct {
 	Bytes []byte
 }
 
+func min(x int, y int) int {
+	if x > y {
+		return y
+	}
+
+	return x
+}
+
+func max(x int, y int) int {
+	if x < y {
+		return y
+	}
+
+	return x
+}
+
 // first byte = request size in bytes
 // second byte = request size in bytes
 // third byte = request size in bytes
@@ -52,7 +68,7 @@ func DigestRequest(conn net.Conn) (string, []byte) {
 	}
 
 	// Convert the first 4 bytes to a uint32 using big-endian format
-	size := binary.BigEndian.Uint32(buffer[:4]) + 4
+	size := binary.BigEndian.Uint32(buffer[:4])
 
 	buffer = make([]byte, size)
 	_, err = conn.Read(buffer)
@@ -65,27 +81,20 @@ func DigestRequest(conn net.Conn) (string, []byte) {
 
 	t_buffer := []byte{}
 
-	endpoint_stop := 0
+	t_activation := false
 
-	for i, val := range buffer {
-		if i > 5 && i == 0 {
-			endpoint_stop = i
-			break
-		} else if i > 5 {
-			b_endpoint = append(b_endpoint, val)
-		}
-	}
-
-	for i, val := range buffer {
-		if i < 36 && val == 0 && i > 4 {
-			stop = true
-		}
-
-		if i > 4 && !stop {
-			b_endpoint = append(b_endpoint, val)
-		} else if stop {
+	for i := range buffer {
+		val := buffer[min(max(len(buffer)-1, 0), i+1)]
+		if !t_activation {
+			if val == 0 && !t_activation {
+				t_activation = true
+			} else if !t_activation {
+				b_endpoint = append(b_endpoint, val)
+			}
+		} else {
 			t_buffer = append(t_buffer, val)
 		}
+
 	}
 
 	return string(b_endpoint), t_buffer
