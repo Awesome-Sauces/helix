@@ -16,6 +16,7 @@ const (
 type EndpointReceiver interface {
 	Call(conn *Connection)
 	Response() []byte
+	ResponseHandler(resp []byte)
 }
 
 type Server struct {
@@ -68,11 +69,9 @@ func (server *Server) Listen() error {
 		endpoint, args := DigestRequest((conn))
 		variables := MapVariables(args)
 
-		connect := Connection{
-			args: variables,
-		}
+		connect := NewConnection(variables)
 
-		server.endpoints[endpoint].Call(&connect)
+		server.endpoints[endpoint].Call(connect)
 		conn.Write(server.endpoints[endpoint].Response())
 	}
 

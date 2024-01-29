@@ -58,7 +58,7 @@ func TestServerCore(t *testing.T) {
 	time.Sleep(1 * time.Second)
 
 	b := make([]byte, 8)
-	binary.LittleEndian.PutUint64(b, uint64(1234567891234567890))
+	binary.BigEndian.PutUint64(b, uint64(1234567891234567890))
 	values, err := BareEncode([]byte("token"), []byte("i64"), b, []byte("name"), []byte("str"), []byte("xrp"), []byte("address"), []byte("str"), []byte("0xA1FC67E"), []byte("send_amount"), []byte("i64"), b)
 
 	if err != nil {
