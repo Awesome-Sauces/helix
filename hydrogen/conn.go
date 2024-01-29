@@ -1,5 +1,17 @@
 package hydrogen
 
+type Connection struct {
+	args []FunctionArgument
+}
+
+func (conn Connection) GetString() {
+
+}
+
+func (conn Connection) GetInt() {
+
+}
+
 /*
 A few methods:
 

@@ -39,24 +39,6 @@ func max(x int, y int) int {
 	return x
 }
 
-// first byte = request size in bytes
-// second byte = request size in bytes
-// third byte = request size in bytes
-// fourth byte = request size in bytes
-// result first_byte + second_byte + third_byte + fourth_byte = max size request = 1020 bytes
-
-// fifth byte-thirty fifth byte = endpoint name (Similar to HTTP)
-// endpoint has a max length of 32 char(s) = 32 bytes
-// The rest of the request is from the 36 byte and on
-// the endpoint will handle the processing with the help of
-// easy
-
-// We assume anything beyond byte 35 are typed values
-// With 6 bytes for the type, the types are the following
-// str(Until end byte is defined as 0x00 (Null)), u32 & i32 (4 bytes),
-// u64 & i64 (8 bytes), u128 & i128 (16 bytes),
-// variable names are given 16 bytes and come before type declaration.
-// variable names and type declaration are seperated by the ascii null (0x00)
 func DigestRequest(conn net.Conn) (string, []byte) {
 	defer conn.Close()
 
@@ -138,7 +120,7 @@ func MapVariables(data []byte) []FunctionArgument {
 				varValue = append(varValue, data[i:i+16]...)
 				i += 16
 			}
-		case "str":
+		case "str", "xdr":
 			for i < len(data) && data[i] != 0x00 {
 				varValue = append(varValue, data[i])
 				i++
