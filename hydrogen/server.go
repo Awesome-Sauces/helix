@@ -15,8 +15,6 @@ const (
 
 type EndpointReceiver interface {
 	Call(conn *Connection)
-	Response() []byte
-	ResponseHandler(resp []byte)
 }
 
 type Server struct {
@@ -40,6 +38,24 @@ func (server *Server) a_Listen() error {
 	server.events = make(chan int)
 
 	return err
+}
+
+func (server *Server) Dial(address string, bytes []byte) ([]byte, error) {
+	conn, err := net.Dial("tcp", address) // "localhost:8080"
+
+	if err != nil {
+		return make([]byte, 0), err
+	}
+
+	conn.Write(bytes)
+
+	response := make([]byte, 256)
+
+	conn.Read(response)
+
+	conn.Close()
+
+	return response, nil
 }
 
 func (server *Server) Listen() error {
@@ -72,7 +88,7 @@ func (server *Server) Listen() error {
 		connect := NewConnection(variables)
 
 		server.endpoints[endpoint].Call(connect)
-		conn.Write(server.endpoints[endpoint].Response())
+		conn.Write(connect.GetWrite())
 	}
 
 	return err
