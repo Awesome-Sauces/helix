@@ -61,7 +61,7 @@ func BareEncode(args ...[]byte) ([]byte, error) {
 		request = append(request, 0x00)
 		request = append(request, varv...)
 
-		if string(vart) == "str" {
+		if string(vart) == "str" || string(vart) == "xdr" {
 			request = append(request, 0x00)
 		}
 
