@@ -28,6 +28,7 @@ require (
 require (
 	github.com/anthdm/hbbft v0.0.0-20190702061856-0826ffdcf567
 	github.com/btcsuite/btcutil v1.0.2
+	github.com/cbergoon/merkletree v0.2.0
 	github.com/ethereum/go-ethereum v1.13.5
 	github.com/google/uuid v1.5.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

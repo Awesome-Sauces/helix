@@ -50,6 +50,10 @@ func PublicKeyToAddress(pubKey *ecdsa.PublicKey) string {
 	return address.Hex()
 }
 
+func PublicKeyToAddressBytes(pubKey *ecdsa.PublicKey) []byte {
+	return crypto.PubkeyToAddress(*pubKey).Bytes()
+}
+
 // GenerateMnemonic generates a new mnemonic phrase.
 // The wordCount should be one of the following: 12, 15, 18, 21, 24.
 func GenerateMnemonic(wordCount int) (string, error) {
