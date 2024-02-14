@@ -10,6 +10,19 @@ import (
 	"time"
 )
 
+type Node struct {
+	ID    int
+	Peers map[int]chan []byte
+}
+
+func (n Node) Gossip(transaction []byte) {
+
+}
+
+func TestOpenTrustProtocol(t *testing.T) {
+
+}
+
 func TestSizeCalculation(t *testing.T) {
 	buffer := []byte{
 		0x00,
